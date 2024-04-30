@@ -35,5 +35,33 @@ namespace BookManagementAPI.Controllers
             books.Add(book);
             return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
         }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateBook(int id, [FromBody] Book book)
+        {
+            var existingBook = books.FirstOrDefault(b => b.Id == id);
+            if (existingBook == null)
+                return NotFound();
+
+            existingBook.Title = book.Title;
+            existingBook.Author = book.Author;
+            existingBook.Description = book.Description;
+            existingBook.Year = book.Year;
+            existingBook.ISBN = book.ISBN;
+            existingBook.AudioURL = book.AudioURL;
+
+            return Ok(existingBook);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteBook(int id)
+        {
+            var book = books.FirstOrDefault(b => b.Id == id);
+            if (book == null)
+                return NotFound();
+
+            books.Remove(book);
+            return NoContent();
+        }
     }
 }
