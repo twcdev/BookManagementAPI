@@ -1,3 +1,7 @@
+using BookManagementAPI.Validation;
+using FluentValidation.AspNetCore;
+using System.Text.Json.Serialization;
+
 namespace BookManagementAPI
 {
     public class Program
@@ -8,7 +12,12 @@ namespace BookManagementAPI
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
+            builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<BookValidator>());
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

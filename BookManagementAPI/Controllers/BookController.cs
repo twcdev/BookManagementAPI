@@ -7,10 +7,7 @@ namespace BookManagementAPI.Controllers
     [Route("[controller]")]
     public class BookController : ControllerBase
     {
-        private static List<Book> books = new List<Book>
-        {
-            new Book { Id = 1, Title = "Sample Book", Author = "Author A", Year = 2021, Description = "<p>Description of book</p>" }
-        };
+        private static List<Book> books = new List<Book>();
 
         [HttpGet]
         public IEnumerable<Book> GetBooks()
@@ -61,7 +58,8 @@ namespace BookManagementAPI.Controllers
                 return NotFound();
 
             books.Remove(book);
-            return NoContent();
+
+            return Ok(book);
         }
     }
 }
