@@ -16,7 +16,7 @@ namespace BookManagementAPI.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Book> GetBooks() => _bookService.GetAllBooks();
+        public List<Book> GetBooks() => _bookService.GetAllBooks();
 
         [HttpGet("{id}")]
         public ActionResult<Book> GetBook(int id)
@@ -25,7 +25,16 @@ namespace BookManagementAPI.Controllers
             return book != null ? Ok(book) : NotFound();
         }
         [HttpPost]
-        public ActionResult<Book> CreateBook([FromBody] Book book) => CreatedAtAction(nameof(GetBook), new { id = book.Id }, _bookService.AddBook(book));
+        public ActionResult<Book> CreateBook([FromBody] Book book)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var newBook = _bookService.AddBook(book);
+            return CreatedAtAction(nameof(GetBook), new { id = newBook.Id }, newBook);
+        }
 
         [HttpPut("{id}")]
         public ActionResult<Book> UpdateBook(int id, [FromBody] Book book)
