@@ -1,4 +1,5 @@
 ﻿using BookManagementAPI.Models;
+using BookManagementAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookManagementAPI.Controllers
@@ -7,59 +8,37 @@ namespace BookManagementAPI.Controllers
     [Route("[controller]")]
     public class BookController : ControllerBase
     {
-        private static List<Book> books = new List<Book>();
+        private readonly IBookService _bookService;
+
+        public BookController(IBookService bookService)
+        {
+            _bookService = bookService;
+        }
 
         [HttpGet]
-        public IEnumerable<Book> GetBooks()
-        {
-            return books;
-        }
+        public IEnumerable<Book> GetBooks() => _bookService.GetAllBooks();
 
         [HttpGet("{id}")]
         public ActionResult<Book> GetBook(int id)
         {
-            var book = books.FirstOrDefault(b => b.Id == id);
-            if (book == null)
-                return NotFound();
-            return book;
+            var book = _bookService.GetBookById(id);
+            return book != null ? Ok(book) : NotFound();
         }
-
         [HttpPost]
-        public IActionResult CreateBook([FromBody] Book book)
-        {
-            // Automatically assign an ID
-            book.Id = books.Any() ? books.Max(b => b.Id) + 1 : 1;
-            books.Add(book);
-            return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
-        }
+        public ActionResult<Book> CreateBook([FromBody] Book book) => CreatedAtAction(nameof(GetBook), new { id = book.Id }, _bookService.AddBook(book));
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBook(int id, [FromBody] Book book)
+        public ActionResult<Book> UpdateBook(int id, [FromBody] Book book)
         {
-            var existingBook = books.FirstOrDefault(b => b.Id == id);
-            if (existingBook == null)
-                return NotFound();
-
-            existingBook.Title = book.Title;
-            existingBook.Author = book.Author;
-            existingBook.Description = book.Description;
-            existingBook.Year = book.Year;
-            existingBook.ISBN = book.ISBN;
-            existingBook.AudioURL = book.AudioURL;
-
-            return Ok(existingBook);
+            var updatedBook = _bookService.UpdateBook(id, book);
+            return updatedBook != null ? Ok(updatedBook) : NotFound();
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteBook(int id)
         {
-            var book = books.FirstOrDefault(b => b.Id == id);
-            if (book == null)
-                return NotFound();
-
-            books.Remove(book);
-
-            return Ok(book);
+            var book = _bookService.DeleteBook(id);
+            return book != null ? Ok(book) : NotFound();
         }
     }
 }
