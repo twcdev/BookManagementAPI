@@ -26,6 +26,7 @@ public class BookService : IBookService
         book.Year = updatedBook.Year;
         book.ISBN = updatedBook.ISBN;
         book.AudioURL = updatedBook.AudioURL;
+        book.BookType = updatedBook.BookType;
         return book;
     }
 
